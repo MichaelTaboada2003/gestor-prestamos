@@ -5,6 +5,7 @@ import { formatDate } from "date-fns";
 import { es } from "date-fns/locale";
 import { EditPaymentDialog } from "@/components/edit-payment-dialog";
 import { History } from "lucide-react";
+import { parseLocalDate } from "@/lib/utils";
 
 export function PaymentHistory({ payments }: { payments: any[] }) {
     return (
@@ -24,7 +25,7 @@ export function PaymentHistory({ payments }: { payments: any[] }) {
                                 <div className="flex justify-between items-start gap-2">
                                     <div>
                                         <span className="font-bold text-base tabular-nums">${Math.round(payment.amount).toLocaleString('es-CO')}</span>
-                                        <div className="text-xs text-muted-foreground capitalize">{formatDate(new Date(payment.date), "dd MMM, yyyy", { locale: es })}</div>
+                                        <div className="text-xs text-muted-foreground capitalize">{formatDate(parseLocalDate(payment.date), "dd MMM, yyyy", { locale: es })}</div>
                                     </div>
                                     <EditPaymentDialog payment={payment} />
                                 </div>

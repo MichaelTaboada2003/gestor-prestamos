@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatDate } from "date-fns";
 import { es } from "date-fns/locale";
 import { Card } from "@/components/ui/card";
+import { parseLocalDate } from "@/lib/utils";
 
 interface AmortizationTabsProps {
     loanId: string;
@@ -46,8 +47,8 @@ export function AmortizationTabs({
                             <TableBody>
                                 {payments.map((row) => (
                                     <TableRow key={row.id}>
-                                        <TableCell className="text-muted-foreground">
-                                            {formatDate(new Date(row.date), "PP", { locale: es })}
+                                        <TableCell className="text-muted-foreground capitalize">
+                                            {formatDate(parseLocalDate(row.date), "PP", { locale: es })}
                                         </TableCell>
                                         <TableCell className="font-semibold">
                                             ${row.amount.toLocaleString('es-CO', { maximumFractionDigits: 0 })}
@@ -81,6 +82,12 @@ export function AmortizationTabs({
                     <div className="p-6 border rounded-xl bg-card">
                         <h3 className="text-lg font-semibold mb-4">Condiciones del Crédito</h3>
                         <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="space-y-1">
+                                <p className="text-sm text-muted-foreground">Fecha de Inicio</p>
+                                <p className="text-xl font-bold capitalize">
+                                    {startDate ? formatDate(parseLocalDate(startDate), "PP", { locale: es }) : "No definida"}
+                                </p>
+                            </div>
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Tasa de Interés Nominal Anual</p>
                                 <p className="text-xl font-bold">{rate}% E.A.</p>

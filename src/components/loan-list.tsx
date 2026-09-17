@@ -3,19 +3,21 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { Calendar, ChevronRight, DollarSign } from "lucide-react";
+import { ChevronRight, Calendar, DollarSign } from "lucide-react";
 import { formatDate } from "date-fns";
 import { es } from "date-fns/locale";
+import { useRouter } from "next/navigation";
+import { parseLocalDate } from "@/lib/utils";
 
 interface Loan {
     id: string;
     name: string;
     principal: number;
-    remainingBalance: number;
-    status: string;
-    startDate: string;
+    annualInterestRate: number;
     termMonths: number;
+    startDate: string;
+    status: string;
+    remainingBalance: number;
 }
 
 export function LoanList({ loans }: { loans: Loan[] }) {
@@ -64,9 +66,9 @@ export function LoanList({ loans }: { loans: Loan[] }) {
                                 </div>
                             </TableCell>
                             <TableCell className="text-muted-foreground">
-                                <div className="flex items-center gap-1.5">
+                                <div className="flex items-center gap-1.5 capitalize">
                                     <Calendar className="h-3.5 w-3.5" />
-                                    {formatDate(new Date(loan.startDate), "PP", { locale: es })}
+                                    {formatDate(parseLocalDate(loan.startDate), "PP", { locale: es })}
                                 </div>
                             </TableCell>
                             <TableCell className="text-center">

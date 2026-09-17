@@ -20,6 +20,9 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { EditLoanDialog } from "@/components/edit-loan-dialog";
+import { formatDate } from "date-fns";
+import { es } from "date-fns/locale";
+import { parseLocalDate } from "@/lib/utils";
 
 function formatCurrency(value: number) {
     return "$" + value.toLocaleString('es-CO', { maximumFractionDigits: 0 });
@@ -64,7 +67,7 @@ export function LoanHeader({ loan }: { loan: any }) {
             pdf.setFontSize(9);
             pdf.setFont("helvetica", "normal");
             pdf.setTextColor(120, 120, 120);
-            pdf.text(`ID: ${loan.id.split('-')[0]}  •  Estado: ${loan.status === 'active' ? 'Activo' : 'Liquidado'}  •  Creado: ${new Date(loan.createdAt).toLocaleDateString('es-CO')}`, margin, 52);
+            pdf.text(`ID: ${loan.id.split('-')[0]}  •  Estado: ${loan.status === 'active' ? 'Activo' : 'Liquidado'}  •  Inicio: ${formatDate(parseLocalDate(loan.startDate), "PP", { locale: es })}`, margin, 52);
 
             // --- Summary cards ---
             const totalPaid = payments.reduce((s: number, p: any) => s + p.amount, 0);
@@ -102,12 +105,12 @@ export function LoanHeader({ loan }: { loan: any }) {
             // --- Payments Table ---
             if (payments.length > 0) {
                 const sortedPayments = [...payments].sort(
-                    (a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime()
+                    (a: any, b: any) => parseLocalDate(a.date).getTime() - parseLocalDate(b.date).getTime()
                 );
 
                 const tableData = sortedPayments.map((p: any, idx: number) => [
                     (idx + 1).toString(),
-                    new Date(p.date).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }),
+                    formatDate(parseLocalDate(p.date), "dd MMM, yyyy", { locale: es }),
                     formatCurrency(p.amount),
                     formatCurrency(p.interestPortion),
                     formatCurrency(p.capitalPortion),
@@ -223,7 +226,7 @@ export function LoanHeader({ loan }: { loan: any }) {
                             {loan.status === 'active' ? 'Activo' : 'Liquidado'}
                         </Badge>
                     </div>
-                    <p className="text-muted-foreground mt-0.5">ID: {loan.id.split('-')[0]} • Creado el {new Date(loan.createdAt).toLocaleDateString('es-CO')}</p>
+                    <p className="text-muted-foreground mt-0.5">ID: {loan.id.split('-')[0]} • Inicio: {formatDate(parseLocalDate(loan.startDate), "PP", { locale: es })}</p>
                 </div>
             </div>
             <div className="flex items-center gap-2">
