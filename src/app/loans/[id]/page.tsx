@@ -29,17 +29,19 @@ export default async function LoanDetailsPage({ params }: { params: Promise<{ id
         <div className="container mx-auto py-10 space-y-8 animate-in fade-in duration-1000">
             <LoanHeader loan={loan} />
 
-            <div className="grid gap-8 md:grid-cols-4">
-                <div className="md:col-span-3 space-y-8">
-                    <LoanStats
-                        principal={principal}
-                        remaining={remainingBalance}
-                        totalPaid={totalPaid}
-                        interestPaid={totalInterestPaid}
-                    >
-                        <RegisterPaymentDrawer loanId={loan.id} remainingBalance={remainingBalance} />
-                    </LoanStats>
+            {/* Panel Principal de Estadísticas y Acciones */}
+            <LoanStats
+                principal={principal}
+                remaining={remainingBalance}
+                totalPaid={totalPaid}
+                interestPaid={totalInterestPaid}
+            >
+                <RegisterPaymentDrawer loanId={loan.id} remainingBalance={remainingBalance} />
+            </LoanStats>
 
+            {/* Sección de Amortización e Historial */}
+            <div className="grid gap-8 lg:grid-cols-3 items-start">
+                <div className="lg:col-span-2 space-y-8">
                     <AmortizationTabs
                         loanId={loan.id}
                         principal={remainingBalance}
@@ -50,7 +52,7 @@ export default async function LoanDetailsPage({ params }: { params: Promise<{ id
                     />
                 </div>
 
-                <div className="md:col-span-1">
+                <div className="lg:col-span-1">
                     <PaymentHistory payments={payments} />
                 </div>
             </div>

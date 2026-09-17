@@ -15,24 +15,24 @@ export function PaymentHistory({ payments }: { payments: any[] }) {
                 </CardTitle>
             </CardHeader>
             <CardContent className="px-0">
-                <div className="relative space-y-4">
+                <div className="relative space-y-4 max-h-[580px] overflow-y-auto pr-2 scrollbar-thin">
                     <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-muted" />
                     {payments.map((payment, idx) => (
-                        <div key={payment.id} className="relative pl-10 animate-in slide-in-from-right-2 duration-300" style={{ animationDelay: `${idx * 100}ms` }}>
+                        <div key={payment.id} className="relative pl-10 animate-in slide-in-from-right-2 duration-300" style={{ animationDelay: `${idx * 50}ms` }}>
                             <div className="absolute left-2.5 top-1.5 h-3.5 w-3.5 rounded-full border-2 border-primary bg-background shadow-sm" />
                             <div className="flex flex-col gap-1">
                                 <div className="flex justify-between items-start gap-2">
                                     <div>
-                                        <span className="font-bold text-base">${payment.amount.toLocaleString('es-CO')}</span>
-                                        <div className="text-xs text-muted-foreground">{formatDate(new Date(payment.date), "dd MMM, yyyy", { locale: es })}</div>
+                                        <span className="font-bold text-base tabular-nums">${Math.round(payment.amount).toLocaleString('es-CO')}</span>
+                                        <div className="text-xs text-muted-foreground capitalize">{formatDate(new Date(payment.date), "dd MMM, yyyy", { locale: es })}</div>
                                     </div>
                                     <EditPaymentDialog payment={payment} />
                                 </div>
-                                <div className="text-xs text-muted-foreground flex flex-wrap gap-x-3">
-                                    <span>Cap: ${payment.capitalPortion.toLocaleString('es-CO')}</span>
-                                    <span>Int: ${payment.interestPortion.toLocaleString('es-CO')}</span>
+                                <div className="text-xs text-muted-foreground flex flex-wrap gap-x-3 tabular-nums">
+                                    <span>Cap: ${Math.round(payment.capitalPortion).toLocaleString('es-CO')}</span>
+                                    <span>Int: ${Math.round(payment.interestPortion).toLocaleString('es-CO')}</span>
                                     {payment.extraPrincipal > 0 && (
-                                        <span className="text-green-600 font-semibold underline">Abono: ${payment.extraPrincipal.toLocaleString('es-CO')}</span>
+                                        <span className="text-green-600 font-semibold underline">Abono: ${Math.round(payment.extraPrincipal).toLocaleString('es-CO')}</span>
                                     )}
                                 </div>
                             </div>
