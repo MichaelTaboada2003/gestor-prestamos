@@ -3,7 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "date-fns";
 import { es } from "date-fns/locale";
-import { ArrowDownCircle, History } from "lucide-react";
+import { EditPaymentDialog } from "@/components/edit-payment-dialog";
+import { History } from "lucide-react";
 
 export function PaymentHistory({ payments }: { payments: any[] }) {
     return (
@@ -20,9 +21,12 @@ export function PaymentHistory({ payments }: { payments: any[] }) {
                         <div key={payment.id} className="relative pl-10 animate-in slide-in-from-right-2 duration-300" style={{ animationDelay: `${idx * 100}ms` }}>
                             <div className="absolute left-2.5 top-1.5 h-3.5 w-3.5 rounded-full border-2 border-primary bg-background shadow-sm" />
                             <div className="flex flex-col gap-1">
-                                <div className="flex justify-between items-start">
-                                    <span className="font-bold text-base">${payment.amount.toLocaleString('es-CO')}</span>
-                                    <span className="text-xs text-muted-foreground">{formatDate(new Date(payment.date), "dd MMM, yyyy", { locale: es })}</span>
+                                <div className="flex justify-between items-start gap-2">
+                                    <div>
+                                        <span className="font-bold text-base">${payment.amount.toLocaleString('es-CO')}</span>
+                                        <div className="text-xs text-muted-foreground">{formatDate(new Date(payment.date), "dd MMM, yyyy", { locale: es })}</div>
+                                    </div>
+                                    <EditPaymentDialog payment={payment} />
                                 </div>
                                 <div className="text-xs text-muted-foreground flex flex-wrap gap-x-3">
                                     <span>Cap: ${payment.capitalPortion.toLocaleString('es-CO')}</span>

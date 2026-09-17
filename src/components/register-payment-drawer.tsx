@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreditCard, Loader2, Sparkles } from "lucide-react";
+import { CreditCard, Loader2, Sparkles, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 export function RegisterPaymentDrawer({ loanId, remainingBalance }: { loanId: string, remainingBalance: number }) {
@@ -34,13 +34,13 @@ export function RegisterPaymentDrawer({ loanId, remainingBalance }: { loanId: st
                 date,
             });
             toast.success("Pago Exitoso", {
-                description: "El pago se ha procesado y el saldo ha sido recalculado.",
+                description: "Proceso completado correctamente.",
             });
             setOpen(false);
             setAmount("");
         } catch (error) {
             toast.error("Error", {
-                description: "Ocurrió un problema al registrar el pago.",
+                description: "No se pudo registrar el pago.",
             });
         } finally {
             setLoading(false);
@@ -50,58 +50,68 @@ export function RegisterPaymentDrawer({ loanId, remainingBalance }: { loanId: st
     return (
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerTrigger asChild>
-                <Button className="w-full h-12 text-lg font-bold shadow-xl shadow-primary/20 bg-primary hover:bg-primary/90">
-                    <CreditCard className="mr-2 h-5 w-5" /> Registrar Pago
+                <Button className="w-full h-14 text-sm font-black uppercase tracking-[0.2em] bg-foreground text-background hover:bg-foreground/90 shadow-2xl transition-all duration-300 active:scale-95">
+                    <CreditCard className="mr-3 h-4 w-4" /> Registrar Pago
                 </Button>
             </DrawerTrigger>
-            <DrawerContent>
+            <DrawerContent className="bg-background border-none">
                 <div className="mx-auto w-full max-w-sm">
-                    <DrawerHeader>
-                        <DrawerTitle className="text-2xl font-bold text-center">Registrar Abono</DrawerTitle>
-                        <DrawerDescription className="text-center">
-                            Ingresa el monto total recibido. El sistema distribuirá el abono a capital automáticamente.
+                    <DrawerHeader className="pt-8">
+                        <DrawerTitle className="text-3xl font-black italic tracking-tighter text-center">Registrar Abono</DrawerTitle>
+                        <DrawerDescription className="text-center text-[10px] font-bold uppercase tracking-widest opacity-60">
+                            Ingreso Manual de Recaudo
                         </DrawerDescription>
                     </DrawerHeader>
-                    <div className="p-4 pb-0 space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="amount">Monto del Pago ($)</Label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
+
+                    <div className="p-6 space-y-6">
+                        <div className="space-y-3">
+                            <Label htmlFor="amount" className="text-[10px] font-black uppercase tracking-widest opacity-70">Monto del Pago ($)</Label>
+                            <div className="relative group">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/40 font-bold">$</span>
                                 <Input
                                     id="amount"
                                     type="number"
                                     placeholder="0.00"
-                                    className="pl-7 text-lg font-semibold"
+                                    className="h-14 pl-8 text-xl font-black bg-foreground/5 border-none focus-visible:ring-1 focus-visible:ring-foreground/20 rounded-xl transition-all"
                                     value={amount}
                                     onChange={(e) => setAmount(e.target.value)}
                                 />
+                                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-foreground scale-x-0 group-focus-within:scale-x-100 transition-transform duration-500" />
                             </div>
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="date">Fecha del Pago</Label>
+
+                        <div className="space-y-3" data-vaul-no-drag>
+                            <Label htmlFor="date" className="text-[10px] font-black uppercase tracking-widest opacity-70">Fecha del Pago</Label>
                             <Input
                                 id="date"
                                 type="date"
+                                className="h-12 bg-foreground/5 border-none font-bold rounded-xl relative z-50"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
+                                onClick={(e) => e.stopPropagation()}
+                                onPointerDown={(e) => e.stopPropagation()}
+                                data-vaul-no-drag
                             />
                         </div>
-                        <div className="bg-secondary/20 p-4 rounded-lg flex items-start gap-3 border border-secondary/30">
-                            <Sparkles className="h-5 w-5 text-primary mt-0.5" />
-                            <div className="text-xs space-y-1">
-                                <p className="font-semibold text-secondary-foreground uppercase">Smart Recalculation</p>
-                                <p className="text-muted-foreground leading-tight">
-                                    Cualquier excedente sobre el capital de la cuota impactará directamente al saldo insoluto (${remainingBalance.toLocaleString('es-CO')}), reduciendo tus intereses futuros.
-                                </p>
-                            </div>
+
+                        <div className="p-4 rounded-2xl border border-foreground/10 bg-foreground/[0.02] flex items-center gap-4">
+                            <CheckCircle2 className="h-5 w-5 text-foreground/20" />
+                            <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-wider leading-relaxed">
+                                El sistema amortizará el capital insoluto actual: <span className="text-foreground/80">${remainingBalance.toLocaleString('es-CO')}</span>
+                            </p>
                         </div>
                     </div>
-                    <DrawerFooter className="pt-6">
-                        <Button onClick={handlePayment} disabled={loading || !amount} className="h-12 text-lg">
-                            {loading ? <Loader2 className="animate-spin" /> : "Confirmar Pago"}
+
+                    <DrawerFooter className="p-6 pt-2">
+                        <Button
+                            onClick={handlePayment}
+                            disabled={loading || !amount}
+                            className="h-14 w-full text-sm font-black uppercase tracking-[0.2em] bg-foreground text-background hover:bg-foreground/90 transition-all"
+                        >
+                            {loading ? <Loader2 className="animate-spin" /> : "Ejecutar Pago"}
                         </Button>
                         <DrawerClose asChild>
-                            <Button variant="outline">Cancelar</Button>
+                            <Button variant="ghost" className="text-[10px] font-black uppercase tracking-widest opacity-50 hover:opacity-100">Cerrar</Button>
                         </DrawerClose>
                     </DrawerFooter>
                 </div>

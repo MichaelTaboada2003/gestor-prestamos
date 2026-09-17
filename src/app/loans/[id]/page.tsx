@@ -24,20 +24,21 @@ export default async function LoanDetailsPage({ params }: { params: Promise<{ id
     // Calculate some insights
     const totalPaid = payments.reduce((sum: number, p: any) => sum + p.amount, 0);
     const totalInterestPaid = payments.reduce((sum: number, p: any) => sum + p.interestPortion, 0);
-    const totalPrincipalPaid = payments.reduce((sum: number, p: any) => sum + (p.capitalPortion + p.extraPrincipal), 0);
 
     return (
-        <div className="container mx-auto py-10 space-y-8 animate-in slide-in-from-bottom-4 duration-700">
+        <div className="container mx-auto py-10 space-y-8 animate-in fade-in duration-1000">
             <LoanHeader loan={loan} />
 
-            <div className="grid gap-6 md:grid-cols-4">
-                <div className="md:col-span-3 space-y-6">
+            <div className="grid gap-8 md:grid-cols-4">
+                <div className="md:col-span-3 space-y-8">
                     <LoanStats
                         principal={principal}
                         remaining={remainingBalance}
                         totalPaid={totalPaid}
                         interestPaid={totalInterestPaid}
-                    />
+                    >
+                        <RegisterPaymentDrawer loanId={loan.id} remainingBalance={remainingBalance} />
+                    </LoanStats>
 
                     <AmortizationTabs
                         loanId={loan.id}
@@ -49,8 +50,7 @@ export default async function LoanDetailsPage({ params }: { params: Promise<{ id
                     />
                 </div>
 
-                <div className="space-y-6">
-                    <RegisterPaymentDrawer loanId={loan.id} remainingBalance={remainingBalance} />
+                <div className="md:col-span-1">
                     <PaymentHistory payments={payments} />
                 </div>
             </div>

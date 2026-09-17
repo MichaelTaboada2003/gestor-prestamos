@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { createLoan } from "@/app/actions";
+import { updateLoan } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -24,7 +24,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Plus, Loader2 } from "lucide-react";
+import { Pencil, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const formSchema = z.object({
@@ -47,34 +47,44 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+interface EditLoanDialogProps {
+    loan: {
+        id: string;
+        name: string;
+        principal: number;
+        annualInterestRate: number;
+        termMonths: number;
+        startDate: string;
+    };
+    trigger?: React.ReactNode;
+}
 
-export function CreateLoanDialog() {
+export function EditLoanDialog({ loan, trigger }: EditLoanDialogProps) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: "",
-            principal: 1000000,
-            annualRate: 12,
-            months: 12,
-            startDate: new Date().toISOString().split("T")[0],
+            name: loan.name,
+            principal: loan.principal,
+            annualRate: loan.annualInterestRate,
+            months: loan.termMonths,
+            startDate: loan.startDate.includes("T") ? loan.startDate.split("T")[0] : loan.startDate,
         },
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setLoading(true);
         try {
-            await createLoan(values);
-            toast.success("Préstamo Creado", {
-                description: `Se ha registrado el préstamo "${values.name}" correctamente.`,
+            await updateLoan(loan.id, values);
+            toast.success("Préstamo Actualizado", {
+                description: `Se han actualizado los datos del préstamo correctamente.`,
             });
             setOpen(false);
-            form.reset();
         } catch (error) {
             toast.error("Error", {
-                description: "No se pudo crear el préstamo. Revisa los datos.",
+                description: "No se pudieron actualizar los datos del préstamo.",
             });
         } finally {
             setLoading(false);
@@ -84,15 +94,17 @@ export function CreateLoanDialog() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="font-semibold shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
-                    <Plus className="mr-2 h-4 w-4" /> Nuevo Préstamo
-                </Button>
+                {trigger || (
+                    <Button variant="outline" size="sm">
+                        <Pencil className="mr-2 h-4 w-4" /> Editar
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] overflow-hidden">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold">Crear Préstamo</DialogTitle>
+                    <DialogTitle className="text-2xl font-bold">Editar Préstamo</DialogTitle>
                     <DialogDescription>
-                        Ingresa los parámetros financieros para generar el nuevo contrato de préstamo.
+                        Modifica los datos del préstamo, incluida la fecha de inicio. Los saldos y pagos se recalcularán automáticamente.
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -104,7 +116,7 @@ export function CreateLoanDialog() {
                                 <FormItem>
                                     <FormLabel>Nombre del Cliente / Referencia</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Ej. Juan Pérez - Libre Inversión" {...field} />
+                                        <Input placeholder="Ej. Juan Pérez" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -170,10 +182,10 @@ export function CreateLoanDialog() {
                             <Button type="submit" className="w-full" disabled={loading}>
                                 {loading ? (
                                     <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creando...
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Guardando...
                                     </>
                                 ) : (
-                                    "Generar Préstamo"
+                                    "Guardar Cambios"
                                 )}
                             </Button>
                         </DialogFooter>

@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { generateAmortizationSchedule } from "@/lib/finances";
 import { formatDate } from "date-fns";
 import { es } from "date-fns/locale";
+import { Card } from "@/components/ui/card";
 
 interface AmortizationTabsProps {
     loanId: string;
@@ -24,46 +23,34 @@ export function AmortizationTabs({
     payments
 }: AmortizationTabsProps) {
 
-    const projection = useMemo(() => {
-        if (principal <= 0 || monthsRemaining <= 0) return [];
-        // The projection starts from the next payment date
-        // For simplicity, we assume monthly from today or last payment
-        const lastPaymentDate = payments.length > 0
-            ? new Date(payments[0].date)
-            : new Date(startDate);
-
-        return generateAmortizationSchedule(principal, rate, monthsRemaining, lastPaymentDate);
-    }, [principal, rate, monthsRemaining, startDate, payments]);
-
     return (
         <Card className="border-none shadow-none bg-transparent">
-            <Tabs defaultValue="projection" className="w-full">
+            <Tabs defaultValue="payments" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 max-w-[400px]">
-                    <TabsTrigger value="projection">Proyección Futura</TabsTrigger>
+                    <TabsTrigger value="payments">Pagos Realizados</TabsTrigger>
                     <TabsTrigger value="legal">Información Base</TabsTrigger>
                 </TabsList>
-                <TabsContent value="projection" className="pt-4 animate-in fade-in duration-500">
-                    <div className="rounded-xl border overflow-hidden">
+                <TabsContent value="payments" className="pt-4 animate-in fade-in duration-500">
+                    <div id="export-content" className="rounded-xl border overflow-hidden bg-background">
                         <Table>
                             <TableHeader className="bg-muted/50">
                                 <TableRow>
-                                    <TableHead className="w-[80px]">Cuota</TableHead>
-                                    <TableHead>Fecha Estimada</TableHead>
-                                    <TableHead>Monto Cuota</TableHead>
+                                    <TableHead>Fecha</TableHead>
+                                    <TableHead>Monto Pagado</TableHead>
                                     <TableHead>Interés</TableHead>
-                                    <TableHead>Capital</TableHead>
+                                    <TableHead>Capital Base</TableHead>
+                                    <TableHead>Extra Capital</TableHead>
                                     <TableHead className="text-right">Saldo Restante</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {projection.map((row) => (
-                                    <TableRow key={row.installmentNumber}>
-                                        <TableCell className="font-medium">#{row.installmentNumber}</TableCell>
+                                {payments.map((row) => (
+                                    <TableRow key={row.id}>
                                         <TableCell className="text-muted-foreground">
-                                            {formatDate(row.date, "PP", { locale: es })}
+                                            {formatDate(new Date(row.date), "PP", { locale: es })}
                                         </TableCell>
                                         <TableCell className="font-semibold">
-                                            ${row.installmentAmount.toLocaleString('es-CO', { maximumFractionDigits: 0 })}
+                                            ${row.amount.toLocaleString('es-CO', { maximumFractionDigits: 0 })}
                                         </TableCell>
                                         <TableCell className="text-amber-600">
                                             ${row.interestPortion.toLocaleString('es-CO', { maximumFractionDigits: 0 })}
@@ -71,15 +58,18 @@ export function AmortizationTabs({
                                         <TableCell className="text-blue-600">
                                             ${row.capitalPortion.toLocaleString('es-CO', { maximumFractionDigits: 0 })}
                                         </TableCell>
+                                        <TableCell className="text-green-600 font-medium">
+                                            ${row.extraPrincipal.toLocaleString('es-CO', { maximumFractionDigits: 0 })}
+                                        </TableCell>
                                         <TableCell className="text-right font-bold">
-                                            ${row.remainingBalance.toLocaleString('es-CO', { maximumFractionDigits: 0 })}
+                                            ${row.remainingBalanceAfter.toLocaleString('es-CO', { maximumFractionDigits: 0 })}
                                         </TableCell>
                                     </TableRow>
                                 ))}
-                                {projection.length === 0 && (
+                                {payments.length === 0 && (
                                     <TableRow>
                                         <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                                            No hay cuotas pendientes. El préstamo está liquidado.
+                                            No se han registrado pagos aún.
                                         </TableCell>
                                     </TableRow>
                                 )}
@@ -114,5 +104,3 @@ export function AmortizationTabs({
         </Card>
     );
 }
-
-import { Card } from "@/components/ui/card";
